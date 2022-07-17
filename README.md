@@ -4,6 +4,8 @@ Colaborators:
 * Ivona Čižić
 * Mateo Martinjak
 
+> Run project by running ```run.bat```
+
 Description:
 ```
 Transakcija je niz operacija nad podacima koje se ponašaju kao jedna nedjeljiva cjelina.
