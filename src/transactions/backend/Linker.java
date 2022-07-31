@@ -1,5 +1,6 @@
 package transactions.backend;
 
+import javax.swing.*;
 import java.util.*;
 import java.io.*;
 
@@ -11,12 +12,12 @@ public class Linker {
     int myId, N;
     Connector connector;
     public IntLinkedList neighbors = new IntLinkedList();
-    public Linker(String basename, int id, int numProc) throws Exception {
+    public Linker(String basename, int id, int numProc,JTextArea textArea) throws Exception {
         myId = id;
         N = numProc;
         dataIn = new BufferedReader[numProc];
         dataOut = new PrintWriter[numProc];
-        Topology.readNeighbors(myId, N, neighbors);
+        Topology.readNeighbors(myId, N, neighbors, textArea);
         connector = new Connector();
         connector.Connect(basename, myId, numProc, dataIn, dataOut);
     }
@@ -33,9 +34,9 @@ public class Linker {
             sendMsg(destIds.getEntry(i), tag, msg);
         }
     }
-    public Msg receiveMsg(int fromId) throws IOException  {
+    public Msg receiveMsg(int fromId,JTextArea textArea) throws IOException  {
         String getline = dataIn[fromId].readLine();
-        Util.println(" received message " + getline);
+        Util.println(" received message " + getline,textArea);
         StringTokenizer st = new StringTokenizer(getline);
         int srcId = Integer.parseInt(st.nextToken());
         int destId = Integer.parseInt(st.nextToken());

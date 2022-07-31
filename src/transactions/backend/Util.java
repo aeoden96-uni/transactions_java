@@ -1,5 +1,6 @@
 package transactions.backend;
 
+import javax.swing.*;
 import java.util.*;
 public class Util {
     public static int max(int a, int b) {
@@ -13,7 +14,7 @@ public class Util {
         }
     }
     public static void myWait(Object obj) {
-        println("waiting");
+        //println("waiting");
         try {
             obj.wait();
         } catch (InterruptedException e) {
@@ -48,10 +49,11 @@ public class Util {
             if (A[i] == x) return i;
         return -1;
     }
-    public static void println(String s){
-        if (Symbols.debugFlag) {
-            System.out.println(s);
-            System.out.flush();
-        }
+    public static void println(String s, JTextArea textArea){
+//        if (Symbols.debugFlag) {
+//            System.out.println(s);
+//            System.out.flush();
+//        }
+        textArea.append(s);
     }
 }

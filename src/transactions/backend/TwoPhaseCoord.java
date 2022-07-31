@@ -1,5 +1,7 @@
 package transactions.backend;
 
+import javax.swing.*;
+
 public class TwoPhaseCoord extends Process {
     boolean globalCommit = false;
     boolean donePhase1 = false;
@@ -10,18 +12,18 @@ public class TwoPhaseCoord extends Process {
         super(initComm);
         numParticipants = N - 1;
     }
-    public synchronized  void doCoordinator() {
+    public synchronized  void doCoordinator(JTextArea textArea) {
         // Phase 1
-        broadcastMsg("request", myId);
+        broadcastMsg("request", myId,textArea);
         while (!donePhase1)
             myWait();
 
         // Phase 2
         if (noReceived)
-            broadcastMsg("finalAbort", myId);
+            broadcastMsg("finalAbort", myId,textArea);
         else {
             globalCommit = true;
-            broadcastMsg("finalCommit", myId);
+            broadcastMsg("finalCommit", myId,textArea);
         }
     }
     public synchronized void handleMsg(Msg m, int src, String tag) {

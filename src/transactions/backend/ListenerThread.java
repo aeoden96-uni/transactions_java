@@ -8,6 +8,7 @@ public class ListenerThread extends Thread {
         this.channel = channel;
         this.process = process;
     }
+
     public void run() {
         while (true) {
             try {

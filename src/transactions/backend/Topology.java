@@ -1,11 +1,12 @@
 package transactions.backend;
 
+import javax.swing.*;
 import java.io.*;
 import java.util.*;
 public class Topology {
     public static void readNeighbors(int myId, int N,
-                                     IntLinkedList neighbors) {
-        Util.println("Reading topology");
+                                     IntLinkedList neighbors, JTextArea textArea) {
+        Util.println("Reading topology",textArea);
         try {
             BufferedReader dIn = new BufferedReader(
 				new FileReader("topology" + myId));
@@ -20,6 +21,6 @@ public class Topology {
         } catch (IOException e) {
             System.err.println(e);
         }
-        Util.println(neighbors.toString());
+        Util.println(neighbors.toString(),textArea);
     }
 }
