@@ -1,6 +1,5 @@
 package transactions.backend;
 
-import javax.swing.*;
 import java.net.*;
 import java.io.*;
 import java.util.*;
@@ -9,7 +8,7 @@ public class NameServer {
     public NameServer() {
         table = new NameTable();
     }
-    public void handleclient(Socket theClient) {
+    void handleclient(Socket theClient) {
         try {
             BufferedReader din = new BufferedReader
             (new InputStreamReader(theClient.getInputStream()));
@@ -36,10 +35,9 @@ public class NameServer {
             System.err.println(e);
         }
     }
-
     public static void main(String[] args) {
         NameServer ns = new NameServer();
-        System.err.println("NameServer started:");
+        System.out.println("NameServer started:");
         try {
             ServerSocket listener = new ServerSocket(Symbols.ServerPort);
             while (true) {
@@ -48,7 +46,7 @@ public class NameServer {
                 aClient.close();
             }
         } catch (IOException e) {
-            System.err.println(e);
+            System.err.println("Server aborted:" + e);
         }
     }
 }

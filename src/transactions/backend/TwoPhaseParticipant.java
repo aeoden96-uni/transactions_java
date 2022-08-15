@@ -1,7 +1,5 @@
 package transactions.backend;
 
-import javax.swing.*;
-
 public class TwoPhaseParticipant extends Process {
     boolean localCommit;
     boolean globalCommit;
@@ -19,13 +17,13 @@ public class TwoPhaseParticipant extends Process {
         while (!done) myWait();
         return globalCommit;
     }
-    public synchronized void handleMsg(Msg m, int src, String tag, JTextArea textArea) {
+    public synchronized void handleMsg(Msg m, int src, String tag) {
         while (!hasProposed) myWait();
         if (tag.equals("request")) {
             if (localCommit)
-                sendMsg(src, "yes",textArea);
+                sendMsg(src, "yes");
             else
-                sendMsg(src, "no",textArea);
+                sendMsg(src, "no");
         } else if (tag.equals("finalCommit")) {
             globalCommit = true;
             done = true;
