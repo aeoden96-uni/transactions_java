@@ -1,4 +1,4 @@
-package transactions.backend;
+package transactions;
 
 import java.util.*;
 public class NameTable {

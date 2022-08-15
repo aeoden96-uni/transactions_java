@@ -1,4 +1,4 @@
-package transactions.backend;
+package transactions;
 
 import java.lang.*; import java.util.*;
 import java.net.*; import java.io.*;

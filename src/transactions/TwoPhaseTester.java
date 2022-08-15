@@ -1,4 +1,4 @@
-package transactions.backend;
+package transactions;
 
 public class TwoPhaseTester {
     public static void main(String[] args) throws Exception {

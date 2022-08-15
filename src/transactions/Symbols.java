@@ -1,4 +1,4 @@
-package transactions.backend;
+package transactions;
 
 public class Symbols {
     public static final int Infinity = -1;

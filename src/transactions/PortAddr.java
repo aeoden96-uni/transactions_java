@@ -1,4 +1,4 @@
-package transactions.backend;
+package transactions;
 
 public class PortAddr {
     String hostname;

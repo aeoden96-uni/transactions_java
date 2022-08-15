@@ -1,4 +1,4 @@
-package transactions.backend;
+package transactions;
 
 import java.util.LinkedList;
 public class IntLinkedList extends LinkedList {
