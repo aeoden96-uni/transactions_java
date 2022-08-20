@@ -4,10 +4,10 @@ Colaborators:
 * Ivona Čižić
 * Mateo Martinjak
 
-> Run project by running:
-1. ```run_OK.bat``` (console)
-2. ```run_aborted.bat``` (console)
-3. run app from ..
+> Run project by running one of the following:
+1. ```run_OK.bat``` (console; compile needed)
+2. ```run_aborted.bat``` (console; compile needed)
+3. ```java -jar .\transactions_java.jar``` (get the executable from [here](https://github.com/aeoden96-uni/transactions_java/releases/tag/0.5))
 
 Description:
 ```
