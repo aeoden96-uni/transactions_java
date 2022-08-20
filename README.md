@@ -4,7 +4,10 @@ Colaborators:
 * Ivona Čižić
 * Mateo Martinjak
 
-> Run project by running ```run.bat```
+> Run project by running:
+1. ```run_OK.bat``` (console)
+2. ```run_aborted.bat``` (console)
+3. run app from ..
 
 Description:
 ```
