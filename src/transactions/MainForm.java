@@ -21,6 +21,8 @@ public class MainForm {
     private JRadioButton noResponseRadioButton;
     private JTextField textField1;
 
+    private boolean returnValue = true;
+
     private static int procId = 1;
     private static int numProc;
 
@@ -87,9 +89,15 @@ public class MainForm {
     }
 
     public void startSlave() throws Exception {
-        //get name of jframe
-
-        TwoPhaseTester("name",procId++,4,true);
+        if(responseOKRadioButton.isSelected()){
+            TwoPhaseTester("name",procId++,4,true);
+        }
+        else if(responseFRadioButton.isSelected()){
+            TwoPhaseTester("name",procId++,4,false);
+        }
+        else{
+            //TwoPhaseTester("name",procId++,4,false);
+        }
     }
 
     public void start() throws Exception {
