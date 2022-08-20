@@ -1,13 +1,23 @@
 package transactions;
 
+import javax.swing.*;
+
 public class TwoPhaseParticipant extends Process {
     boolean localCommit;
     boolean globalCommit;
     boolean done = false;
     boolean hasProposed = false;
+
+
     public TwoPhaseParticipant(Linker initComm) {
         super(initComm);
     }
+
+    public TwoPhaseParticipant(Linker initComm, JTextArea textArea) {
+        this(initComm);
+        this.textArea = textArea;
+    }
+
     public synchronized void propose(boolean vote) {
         localCommit = vote;
         hasProposed = true;

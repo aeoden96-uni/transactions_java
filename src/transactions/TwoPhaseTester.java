@@ -10,7 +10,7 @@ public class TwoPhaseTester {
         String baseName = args[0];
         int myId = Integer.parseInt(args[1]);
         int numProc = Integer.parseInt(args[2]);
-        Linker comm = new Linker(baseName, myId, numProc);
+        Linker comm = new Linker(baseName, myId, numProc );
         if (myId == 0) {
             TwoPhaseCoord master = new TwoPhaseCoord(comm);
             for (int i = 0; i < numProc; i++)

@@ -3,6 +3,9 @@ package transactions;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 public class MainForm {
 
@@ -16,34 +19,48 @@ public class MainForm {
     private JRadioButton responseOKRadioButton;
     private JRadioButton responseFRadioButton;
     private JRadioButton noResponseRadioButton;
+    private JTextField textField1;
+
+    private static int procId = 1;
+    private static int numProc;
 
     private ButtonGroup typeGroup;
 
     private ButtonGroup responseGroup;
 
+    public void setProgressBar(int value) {
+        progressBar1.setValue(value);
+    }
+
     public static void main(String[] args){
 
-        JFrame frame = new JFrame("Transactions");
+        numProc = 3;
+        if(args.length > 0) {
+            numProc = Integer.parseInt(args[0]);
+        }
+
+        JFrame frame = new JFrame("NameServer");
         frame.setContentPane(new MainForm().panel1);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocation(200, 500);
         frame.pack();
         frame.setVisible(true);
 
-        JFrame master = new JFrame("Transactions");
+        JFrame master = new JFrame("Master");
         master.setContentPane(new MainForm().panel1);
         master.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         master.setLocation(500, 500);
         master.pack();
         master.setVisible(true);
 
-        for (int i = 0; i < 3; i++) {
-            JFrame slave = new JFrame("Transactions");
+        for (int i = 0; i < numProc; i++) {
+            JFrame slave = new JFrame("Slave " + (i + 1));
             slave.setContentPane(new MainForm().panel1);
             slave.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             slave.setLocation(1000, 300*i);
             slave.pack();
             slave.setVisible(true);
+
         }
 
 
@@ -65,6 +82,39 @@ public class MainForm {
     }
 
 
+    public void startMaster() throws Exception {
+        TwoPhaseTester("name",0,4,true);
+    }
+
+    public void startSlave() throws Exception {
+        //get name of jframe
+
+        TwoPhaseTester("name",procId++,4,true);
+    }
+
+    public void start() throws Exception {
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if(nameServerRadioButton.isSelected()){
+                        startNameServer();
+                    }
+                    else if(masterRadioButton.isSelected()){
+                        startMaster();
+                    }
+                    else{
+                        startSlave();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+
+    }
 
     public MainForm() {
 
@@ -108,6 +158,7 @@ public class MainForm {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 startButton.setText("Running...");
                 startButton.setEnabled(false);
                 progressBar1.setVisible(true);
@@ -119,39 +170,59 @@ public class MainForm {
                 nameServerRadioButton.setEnabled(false);
                 masterRadioButton.setEnabled(false);
                 slaveRadioButton.setEnabled(false);
+
+                try {
+                    start();
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 
 
     }
 
-    public static boolean TwoPhaseTester(String[] args) throws Exception {
-        //print args
-        for (int i = 0; i < args.length; i++) {
-            System.out.println(args[i]);
+    public void startNameServer() {
+        NameServer ns = new NameServer();
+        textArea1.append("NameServer started:");
+        try {
+            ServerSocket listener = new ServerSocket(Symbols.ServerPort);
+            while (true) {
+                Socket aClient = listener.accept();
+                ns.handleclient(aClient);
+                aClient.close();
+            }
+        } catch (IOException e) {
+            System.err.println("Server aborted:" + e);
         }
+    }
 
-        String baseName = args[0];
-        int myId = Integer.parseInt(args[1]);
-        int numProc = Integer.parseInt(args[2]);
-        Linker comm = new Linker(baseName, myId, numProc);
+
+
+
+    public void TwoPhaseTester(String baseName, int myId, int numProc, boolean t) throws Exception {
+        //print args
+//        for (int i = 0; i < args.length; i++) {
+//            System.out.println(args[i]);
+//        }
+
+        Linker comm = new Linker(baseName, myId, numProc, textArea1);
         if (myId == 0) {
-            TwoPhaseCoord master = new TwoPhaseCoord(comm);
+            TwoPhaseCoord master = new TwoPhaseCoord(comm,textArea1);
             for (int i = 0; i < numProc; i++)
                 if (i != myId)
                     (new ListenerThread(i, master)).start();
-            master.doCoordinator();
-            return true;
+
+            textArea1.append(master.doCoordinator()+"\n");
         }
         else {
             TwoPhaseParticipant slave = new TwoPhaseParticipant(comm);
             for (int i = 0; i < numProc; i++)
                 if (i != myId)
                     (new ListenerThread(i, slave)).start();
-            if (args[3].equals("t")) slave.propose(true);
-            else slave.propose(false);
-            System.out.println("The value decided:" + slave.decide());
-            return slave.decide();
+
+            slave.propose(t);
+            textArea1.append("The value decided:" + slave.decide());
         }
     }
 }

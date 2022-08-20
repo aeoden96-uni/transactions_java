@@ -1,5 +1,6 @@
 package transactions;
 
+import javax.swing.*;
 import java.util.*;
 import java.io.*;
 
@@ -9,8 +10,21 @@ public class Linker {
     BufferedReader[] dataIn;
     BufferedReader dIn;
     int myId, N;
+
+    JTextArea textArea;
     Connector connector;
     public IntLinkedList neighbors = new IntLinkedList();
+    public Linker(String basename, int id, int numProc,JTextArea textArea) throws Exception {
+        myId = id;
+        N = numProc;
+        dataIn = new BufferedReader[numProc];
+        dataOut = new PrintWriter[numProc];
+        Topology.readNeighbors(myId, N, neighbors, textArea);
+        connector = new Connector();
+        connector.Connect(basename, myId, numProc, dataIn, dataOut);
+        this.textArea = textArea;
+    }
+
     public Linker(String basename, int id, int numProc) throws Exception {
         myId = id;
         N = numProc;
@@ -20,6 +34,7 @@ public class Linker {
         connector = new Connector();
         connector.Connect(basename, myId, numProc, dataIn, dataOut);
     }
+
     public void sendMsg(int destId, String tag, String msg) {
         dataOut[destId].println(myId + " " + destId + " " +
                 tag + " " + msg + "#");
@@ -35,7 +50,12 @@ public class Linker {
     }
     public Msg receiveMsg(int fromId) throws IOException  {
         String getline = dataIn[fromId].readLine();
-        Util.println(" received message " + getline);
+
+        if(textArea != null)
+            Util.println(" received message " + getline, textArea);
+        else
+            Util.println(" received message " + getline);
+
         StringTokenizer st = new StringTokenizer(getline);
         int srcId = Integer.parseInt(st.nextToken());
         int destId = Integer.parseInt(st.nextToken());

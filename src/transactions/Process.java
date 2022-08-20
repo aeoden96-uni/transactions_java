@@ -1,9 +1,13 @@
 package transactions;
+import javax.swing.*;
 import java.io.*; import java.lang.*;
 
 public class Process implements MsgHandler {
     int N, myId;
     Linker comm;
+
+    JTextArea textArea;
+
     public Process(Linker initComm) {
         comm = initComm;
         myId = comm.getMyId();
@@ -12,12 +16,18 @@ public class Process implements MsgHandler {
     public synchronized void handleMsg(Msg m, int src, String tag) {
     }
     public void sendMsg(int destId, String tag, String msg) {
-        Util.println("Sending msg to " + destId + ":" +tag + " " + msg);
+        if(textArea != null)
+            Util.println("Sending msg to " + destId + ":" +tag + " " + msg,textArea);
+        else
+            Util.println("Sending msg to " + destId + ":" +tag + " " + msg);
         comm.sendMsg(destId, tag, msg);
     }
+
+
     public void sendMsg(int destId, String tag, int msg) {
         sendMsg(destId, tag, String.valueOf(msg)+" ");
     }
+
     public void sendMsg(int destId, String tag, int msg1, int msg2) {
         sendMsg(destId,tag,String.valueOf(msg1)
                 +" "+String.valueOf(msg2)+" ");
@@ -26,9 +36,14 @@ public class Process implements MsgHandler {
         sendMsg(destId, tag, " 0 ");
     }
     public void broadcastMsg(String tag, int msg) {
-        for (int i = 0; i < N; i++)
-            if (i != myId) sendMsg(i, tag, msg);
+        for (int i = 0; i < N; i++) {
+            if (i != myId) {
+                sendMsg(i, tag, msg);
+            }
+        }
+
     }
+
     public void sendToNeighbors(String tag, int msg) {
         for (int i = 0; i < N; i++)
             if (isNeighbor(i)) sendMsg(i, tag, msg);
