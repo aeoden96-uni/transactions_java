@@ -20,6 +20,15 @@ dijelovi složno naprave ili commit ili rollback? Riječ je o specifičnom probl
 U projektu treba objasniti, analizirati, implementirati i testirati poznati algoritam dvofaznog
 pohranjivanja (two-phase commit). 
 ```
+## Program example (num_of_nodes = 3)
+
+### Sucessfull transaction commit
+#### All nodes returned 'success' message back to master node.
+![This is an image](animation_success.gif)
+
+### Failed transaction commit
+#### First slave node returned 'failed' message back to master node.
+![This is an image](animation_fail.gif)
 
 ## Run project
 1. get the executable from [here](https://github.com/aeoden96-uni/transactions_java/releases/latest/download/transactions_java.jar)
