@@ -1,4 +1,4 @@
-# Transactions in java
+# Transactions in Java - Two-phase commit 
 
 Colaborators:
 * Ivona Čižić
