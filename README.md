@@ -20,14 +20,14 @@ dijelovi složno naprave ili commit ili rollback? Riječ je o specifičnom probl
 U projektu treba objasniti, analizirati, implementirati i testirati poznati algoritam dvofaznog
 pohranjivanja (two-phase commit). 
 ```
-## Program example (num_of_nodes = 3)
+## Program example (num_of_participants = 3)
 
 ### Sucessfull transaction commit
-#### All nodes returned 'success' message back to master node.
+#### All Participants returned 'success' message back to Coordinator.
 ![This is an image](animation_success.gif)
 
 ### Failed transaction commit - doing rollback
-#### First slave node returned 'failed' message back to master node.
+#### First Participant returned 'failed' message back to Coordinator.
 ![This is an image](animation_fail.gif)
 
 ## Run project
@@ -35,7 +35,7 @@ pohranjivanja (two-phase commit).
 
 2. Run in console:
 ```
-java -jar ./transactions_java.jar num_of_nodes(optional)(if not given,only one GUI windows will start)
+java -jar ./transactions_java.jar num_of_participants(optional)(if not given,only one GUI windows will start)
 ```
 
 Example:
@@ -47,8 +47,8 @@ java -jar ./transactions_java.jar 3
 3. To start a transaction, press Start in every window:
 
     1. Pick ```Name server``` and press ```Start```
-    2. Pick ```master``` ,type in ```num_of_nodes``` and press ```Start```
-    3. For every ```slave```  type in ```num_of_nodes``` and  ```id``` (1,2,3...) and press ```Start```
+    2. Pick ```master``` ,type in ```num_of_participants``` and press ```Start```
+    3. For every ```slave```  type in ```num_of_participants``` and  ```id``` (1,2,3...) and press ```Start```
     
     
     
