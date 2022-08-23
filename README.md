@@ -4,12 +4,8 @@ Colaborators:
 * Ivona Čižić
 * Mateo Martinjak
 
-> Run project by running one of the following:
-1. ```run_OK.bat``` (console; compile needed)
-2. ```run_aborted.bat``` (console; compile needed)
-3. ```java -jar .\transactions_java.jar``` (get the executable from [here](https://github.com/aeoden96-uni/transactions_java/releases/tag/0.5))
+## About 
 
-Description:
 ```
 Transakcija je niz operacija nad podacima koje se ponašaju kao jedna nedjeljiva cjelina.
 Istovremeno izvođenje više transakcija mora biti ekvivalentno nekom njihovom
@@ -25,7 +21,30 @@ U projektu treba objasniti, analizirati, implementirati i testirati poznati algo
 pohranjivanja (two-phase commit). 
 ```
 
-Literature:
+## Run project
+1. get the executable from [here](https://github.com/aeoden96-uni/transactions_java/releases/latest/download/transactions_java.jar)
+
+2. Run in console:
+```
+java -jar ./transactions_java.jar num_of_nodes(optional)(if not given,only one GUI windows will start)
+```
+
+Example:
+```
+java -jar ./transactions_java.jar 3
+```
+
+
+3. To start a transaction, press Start in every window:
+
+    1. Pick ```Name server``` and press ```Start```
+    2. Pick ```master``` ,type in ```num_of_nodes``` and press ```Start```
+    3. For every ```slave```  type in ```num_of_nodes``` and  ```id``` (1,2,3...) and press ```Start```
+    
+    
+    
+## Literature
+
 
 Garg V.K. [Concurrent and Distributed Computing in Java](http://users.ece.utexas.edu/~garg/jbk.html) Wiley – IEEE Press CHAPTER 16
 
