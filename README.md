@@ -26,7 +26,7 @@ pohranjivanja (two-phase commit).
 #### All nodes returned 'success' message back to master node.
 ![This is an image](animation_success.gif)
 
-### Failed transaction commit
+### Failed transaction commit - doing rollback
 #### First slave node returned 'failed' message back to master node.
 ![This is an image](animation_fail.gif)
 
