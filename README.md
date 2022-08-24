@@ -24,11 +24,15 @@ pohranjivanja (two-phase commit).
 
 ### Sucessfull transaction commit
 #### All Participants returned 'success' message back to Coordinator.
-![This is an image](animation_success.gif)
+![This is an image](anim_success.gif)
 
 ### Failed transaction commit - doing rollback
 #### First Participant returned 'failed' message back to Coordinator.
-![This is an image](animation_fail.gif)
+![This is an image](anim_fail.gif)
+
+### Failed transaction commit - no response from participant
+#### Second Participant didn't return message back to Coordinator.
+![This is an image](anim_no_response.gif)
 
 ## Run project
 1. get the executable from [here](https://github.com/aeoden96-uni/transactions_java/releases/latest/download/transactions_java.jar)
