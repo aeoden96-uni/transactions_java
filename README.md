@@ -37,8 +37,8 @@ java -jar ./transactions_java.jar 3
 3. To start a transaction, press Start in every window:
 
     1. Pick ```Name server``` and press ```Start```
-    2. Pick ```master``` ,type in ```num_of_participants``` and press ```Start```
-    3. For every ```slave```  type in ```num_of_participants``` and  ```id``` (1,2,3...) and press ```Start```
+    2. Pick ```coordinator``` ,type in ```num_of_participants``` and press ```Start```
+    3. For every ```participant```  type in ```num_of_participants``` and  ```id``` (1,2,3...) and press ```Start```
     
 ## Program example (num_of_participants = 2)
 
