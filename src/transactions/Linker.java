@@ -51,16 +51,23 @@ public class Linker {
     public Msg receiveMsg(int fromId) throws IOException  {
         String getline = dataIn[fromId].readLine();
 
-        if(textArea != null)
-            Util.println(" received message " + getline, textArea);
-        else
-            Util.println(" received message " + getline);
+
 
         StringTokenizer st = new StringTokenizer(getline);
         int srcId = Integer.parseInt(st.nextToken());
         int destId = Integer.parseInt(st.nextToken());
         String tag = st.nextToken();
         String msg = st.nextToken("#");
+
+        if(textArea != null)
+            Util.println(" ⟶⟶⟶ received message\n"
+                    + "           source:   " + srcId + "\n"
+                    + "           destination:  " + destId + "\n"
+                    + "           tag:     " + tag + "\n"
+                    + "           message: " + msg + "\n", textArea);
+        else
+            Util.println(" received message " + getline);
+
         return new Msg(srcId, destId, tag, msg);
     }
     public int getMyId() { return myId; }

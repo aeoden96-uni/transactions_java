@@ -16,8 +16,16 @@ public class Process implements MsgHandler {
     public synchronized void handleMsg(Msg m, int src, String tag) {
     }
     public void sendMsg(int destId, String tag, String msg) {
-        if(textArea != null)
-            Util.println("Sending msg to " + destId + ":" +tag + " " + msg,textArea);
+
+
+        if(textArea != null){
+            Util.println(  "Sending ⟶⟶⟶\n"
+                    + "            destination: " + destId + "\n"
+                    + "            tag: " + tag + "\n"
+                    + "            message: " + msg + "\n",textArea);
+
+        }
+
         else
             Util.println("Sending msg to " + destId + ":" +tag + " " + msg);
         comm.sendMsg(destId, tag, msg);
@@ -33,7 +41,7 @@ public class Process implements MsgHandler {
                 +" "+String.valueOf(msg2)+" ");
     }
     public void sendMsg(int destId, String tag) {
-        sendMsg(destId, tag, " 0 ");
+        sendMsg(destId, tag, " some piece of data from " + myId + ". participant");
     }
     public void broadcastMsg(String tag, int msg) {
         for (int i = 0; i < N; i++) {

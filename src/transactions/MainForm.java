@@ -9,7 +9,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class MainForm {
-
+    Color green = new Color(0, 141, 0); //GREEN
+    Color red = new Color(255, 0, 0); //RED
     private JPanel panel1;
     private JRadioButton nameServerRadioButton;
     private JRadioButton masterRadioButton;
@@ -20,11 +21,14 @@ public class MainForm {
     private JRadioButton responseOKRadioButton;
     private JRadioButton responseFRadioButton;
     private JRadioButton noResponseRadioButton;
-    private JTextField processId;
-    private JTextField numOfProcesess;
     private JProgressBar statusCheck;
     private JLabel labelID;
     private JLabel labelNum;
+    private JProgressBar participantReply;
+    private JLabel participantReplyLabel;
+    private JLabel statusLabel;
+    private JSpinner processId;
+    private JSpinner numOfProcesess;
 
 
     private ButtonGroup typeGroup;
@@ -42,103 +46,65 @@ public class MainForm {
     }
 
     public static void main(String[] args){
-
+        int    numProc = 1;
 
         if(args.length > 0) {
-            int numProc = Integer.parseInt(args[0]);
+            numProc = Integer.parseInt(args[0]) + 2;
 
-            JFrame frame = new JFrame("NameServer");
-            frame.setContentPane(new MainForm().panel1);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setLocation(200, 500);
-            frame.setResizable(false);
-            frame.setPreferredSize(new Dimension(330, 320));
-            frame.pack();
-            frame.setVisible(true);
-
-
-            JFrame master = new JFrame("Master");
-            master.setContentPane(new MainForm().panel1);
-            master.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            master.setLocation(500, 500);
-            master.setResizable(false);
-            master.setPreferredSize(new Dimension(330, 320));
-            master.pack();
-            master.setVisible(true);
-
-            for (int i = 0; i < numProc; i++) {
-                JFrame slave = new JFrame("Slave " + (i + 1));
-                slave.setContentPane(new MainForm().panel1);
-                slave.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                slave.setLocation(1000, 200*i);
-                slave.setResizable(false);
-                slave.setPreferredSize(new Dimension(370, 320));
-                slave.setSize(new Dimension(330, 320));
-                slave.pack();
-                slave.setVisible(true);
-
-            }
-        }
-        else {
-            JFrame master = new JFrame("TwoPhaseCoord");
-            master.setContentPane(new MainForm().panel1);
-            master.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            master.setResizable(false);
-            master.setPreferredSize(new Dimension(330, 320));
-            master.setLocation(500, 500);
-            master.pack();
-            master.setVisible(true);
         }
 
+        for (int i = 0; i < numProc; i++) {
+            JFrame slave = new JFrame("Two-phase commit protocol");
+            slave.setContentPane(new MainForm().panel1);
+            slave.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            slave.setLocation(1000, 100* i);
+            slave.setResizable(false);
+            slave.setPreferredSize(new Dimension(500, 350));
+            slave.setSize(new Dimension(330, 320));
+            slave.pack();
+            slave.setVisible(true);
+        }
 
     }
 
     public void handleRadioButton(){
-        if(masterRadioButton.isSelected()){
 
-            //disable response radio buttons
-            responseOKRadioButton.setVisible(false);
-            responseFRadioButton.setVisible(false);
-            noResponseRadioButton.setVisible(false);
+        responseOKRadioButton.setVisible(slaveRadioButton.isSelected());
+        responseFRadioButton.setVisible(slaveRadioButton.isSelected());
+        noResponseRadioButton.setVisible(slaveRadioButton.isSelected());
 
-            processId.setVisible(true);
-            processId.setEnabled(false);
-            processId.setText("0");
+        //ID and number of processes
+        labelID.setVisible(!nameServerRadioButton.isSelected());
+        processId.setVisible(!nameServerRadioButton.isSelected());
+        processId.setEnabled(slaveRadioButton.isSelected());
+        processId.setValue(slaveRadioButton.isSelected()? processId.getValue() : 0);
 
-            numOfProcesess.setVisible(true);
+        labelNum.setVisible(!nameServerRadioButton.isSelected());
+        numOfProcesess.setVisible(!nameServerRadioButton.isSelected());
 
-            labelID.setVisible(true);
+        //indicators
+        statusLabel.setVisible(!nameServerRadioButton.isSelected());
+        statusCheck.setVisible(!nameServerRadioButton.isSelected());
 
-            labelNum.setVisible(true);
+        participantReplyLabel.setVisible(slaveRadioButton.isSelected());
+        participantReply.setVisible(slaveRadioButton.isSelected());
+
+
+        if(responseOKRadioButton.isSelected()){
+            participantReply.setForeground(green);
         }
-        else if(nameServerRadioButton.isSelected()){
-            responseOKRadioButton.setVisible(false);
-            responseFRadioButton.setVisible(false);
-            noResponseRadioButton.setVisible(false);
-
-            processId.setVisible(false);
-            numOfProcesess.setVisible(false);
-
-            labelID.setVisible(false);
-            labelNum.setVisible(false);
+        else if(responseFRadioButton.isSelected()){
+            participantReply.setForeground(red);
         }
         else{
-            //enable response radio buttons
-            responseOKRadioButton.setVisible(true);
-            responseFRadioButton.setVisible(true);
-            noResponseRadioButton.setVisible(true);
-            processId.setVisible(true);
-            processId.setEnabled(true);
-            numOfProcesess.setVisible(true);
-
-            labelID.setVisible(true);
-            labelNum.setVisible(true);
+            participantReply.setForeground(Color.BLACK);
         }
+
     }
 
 
     public void startMaster() throws Exception {
-        int numOfProcesess = Integer.parseInt(this.numOfProcesess.getText());
+        int numOfProcesess = Integer.parseInt(this.numOfProcesess.getValue().toString());
 
         Linker comm = new Linker("name", 0, numOfProcesess + 1, textArea1);
         TwoPhaseCoord master = new TwoPhaseCoord(comm,textArea1);
@@ -175,17 +141,36 @@ public class MainForm {
         if(responseOKRadioButton.isSelected()){
             response = true;
         }
-        else if(responseFRadioButton.isSelected()){
+        else{
             response = false;
         }
-        else{
-            return;
+
+        int processId = -1;
+        int numOfProcesess = -1;
+
+        try{
+            processId = Integer.parseInt(this.processId.getValue().toString());
+            numOfProcesess = Integer.parseInt(this.numOfProcesess.getValue().toString());
+
+            assert processId > 0 && processId <= numOfProcesess;
+        }
+        catch(Exception e){
+            JOptionPane.showMessageDialog(null, "Participant ID is not valid");
+            //exit program
+            System.exit(1);
+
         }
 
-        int processId = Integer.parseInt(this.processId.getText());
-        int numOfProcesess = Integer.parseInt(this.numOfProcesess.getText());
+        Linker comm = null;
+        try {
+            comm = new Linker("name",processId , numOfProcesess + 1, textArea1);
+        } catch (java.net.ConnectException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog( new JFrame("Error"), "Name server is not running", "Error", JOptionPane.ERROR_MESSAGE);
 
-        Linker comm = new Linker("name",processId , numOfProcesess + 1, textArea1);
+            System.exit(1);
+        }
+
 
         TwoPhaseParticipant slave = new TwoPhaseParticipant(comm,textArea1);
         for (int i = 0; i < numOfProcesess + 1; i++)
@@ -193,40 +178,42 @@ public class MainForm {
                 (new ListenerThread(i, slave)).start();
 
 
-        Color green = new Color(0, 141, 0); //GREEN
-        Color red = new Color(255, 0, 0); //RED
 
-        if(response){
-            progressBar1.setForeground(green);
-        }
-        else{
-            progressBar1.setForeground(red);
-        }
+        textArea1.append("The value decided:" + response + "\n\n");
+
 
         int r = (int) (Math.random() * 12) + 1;
         for(int k = 0; k < 100; k+=r){
             setProgressBar(k,"Sending confirmation to coordinator");
             Thread.sleep(100);
-
         }
-        setProgressBar(100,"Sending confirmation to coordinator");
+
+        Color yellow = new Color(92, 92, 27);
+        if(noResponseRadioButton.isSelected()){
+            textArea1.append("\nError - No response from the participant.\n\n");
+            setProgressBar(100,"Error - no response from the participant");
+
+            progressBar1.setForeground(yellow);
+            progressBar1.setIndeterminate(true);
+            Thread.sleep(100000);
+            return;
+        }
+
         slave.propose(response);
 
         setProgressBar(100,"Waiting for coordinator");
-        Color yellow = new Color(92, 92, 27);
+
         statusCheck.setForeground(yellow);
 
         boolean result = slave.decide();
 
-        textArea1.append("The value decided:" + response);
-        setProgressBar(100,"Sent: " + response);
-
-
 
         if(result){
-            statusCheck.setForeground(Color.GREEN);
+            statusCheck.setForeground(green);
         }
         else{
+
+
             statusCheck.setForeground(red);
         }
 
@@ -283,7 +270,11 @@ public class MainForm {
         statusCheck.setValue(100);
         statusCheck.setForeground(Color.gray);
 
-        numOfProcesess.setText("3");
+        numOfProcesess.setValue(3);
+
+        participantReply.setValue(100);
+        participantReply.setForeground(green);
+        participantReply.setEnabled(false);
 
 
 
@@ -338,7 +329,7 @@ public class MainForm {
         textArea1.append("NameServer started");
 
 
-        statusCheck.setForeground(Color.GREEN);
+        statusCheck.setForeground(green);
         try {
             ServerSocket listener = new ServerSocket(Symbols.ServerPort);
             while (true) {
@@ -352,37 +343,4 @@ public class MainForm {
     }
 
 
-
-
-//    public void TwoPhaseTester(String baseName, int myId, int numProc, boolean t) throws Exception {
-//        //print args
-////        for (int i = 0; i < args.length; i++) {
-////            System.out.println(args[i]);
-////        }
-//
-//        Linker comm = new Linker(baseName, myId, numProc, textArea1);
-//        if (myId == 0) {
-//            TwoPhaseCoord master = new TwoPhaseCoord(comm,textArea1);
-//            for (int i = 0; i < numProc; i++)
-//                if (i != myId)
-//                    (new ListenerThread(i, master)).start();
-//
-//            textArea1.append(master.doCoordinator()+"\n");
-//        }
-//        else {
-//            TwoPhaseParticipant slave = new TwoPhaseParticipant(comm,textArea1);
-//            for (int i = 0; i < numProc; i++)
-//                if (i != myId)
-//                    (new ListenerThread(i, slave)).start();
-//
-//            //sleep between 5 and 10 seconds
-//            int sleepTime = (int) (Math.random() * 5000) + 5000;
-//
-//            Thread.sleep(sleepTime);
-//
-//            slave.propose(t);
-//            textArea1.append("The value decided:" + slave.decide());
-//        }
-//    }
-//
 }
