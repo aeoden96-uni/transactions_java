@@ -20,19 +20,6 @@ dijelovi složno naprave ili commit ili rollback? Riječ je o specifičnom probl
 U projektu treba objasniti, analizirati, implementirati i testirati poznati algoritam dvofaznog
 pohranjivanja (two-phase commit). 
 ```
-## Program example (num_of_participants = 3)
-
-### Sucessfull transaction commit
-#### All Participants returned 'success' message back to Coordinator.
-![This is an image](anim_success.gif)
-
-### Failed transaction commit - doing rollback
-#### First Participant returned 'failed' message back to Coordinator.
-![This is an image](anim_fail.gif)
-
-### Failed transaction commit - no response from participant
-#### Second Participant didn't return message back to Coordinator.
-![This is an image](anim_no_response.gif)
 
 ## Run project
 1. get the executable from [here](https://github.com/aeoden96-uni/transactions_java/releases/latest/download/transactions_java.jar)
@@ -47,14 +34,25 @@ Example:
 java -jar ./transactions_java.jar 3
 ```
 
-
 3. To start a transaction, press Start in every window:
 
     1. Pick ```Name server``` and press ```Start```
     2. Pick ```master``` ,type in ```num_of_participants``` and press ```Start```
     3. For every ```slave```  type in ```num_of_participants``` and  ```id``` (1,2,3...) and press ```Start```
     
-    
+## Program example (num_of_participants = 2)
+
+### Sucessfull transaction commit
+#### All Participants returned 'success' message back to Coordinator.
+![This is an image](anim_success.gif)
+
+### Failed transaction commit - doing rollback
+#### First Participant returned 'failed' message back to Coordinator.
+![This is an image](anim_fail.gif)
+
+### Failed transaction commit - no response from participant
+#### Second Participant didn't return message back to Coordinator.
+![This is an image](anim_no_response.gif)    
     
 ## Literature
 
