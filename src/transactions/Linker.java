@@ -25,15 +25,6 @@ public class Linker {
         this.textArea = textArea;
     }
 
-    public Linker(String basename, int id, int numProc) throws Exception {
-        myId = id;
-        N = numProc;
-        dataIn = new BufferedReader[numProc];
-        dataOut = new PrintWriter[numProc];
-        Topology.readNeighbors(myId, N, neighbors);
-        connector = new Connector();
-        connector.Connect(basename, myId, numProc, dataIn, dataOut);
-    }
 
     public void sendMsg(int destId, String tag, String msg) {
         dataOut[destId].println(myId + " " + destId + " " +

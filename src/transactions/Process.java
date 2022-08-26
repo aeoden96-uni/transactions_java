@@ -2,8 +2,16 @@ package transactions;
 import javax.swing.*;
 import java.io.*; import java.lang.*;
 
+
+/**
+ * This class is used to process the messages received from the server. It is
+ * responsible for creating the appropriate transaction object and passing the
+ * message to the transaction object.
+ *
+ */
 public class Process implements MsgHandler {
     int N, myId;
+
     Linker comm;
 
     JTextArea textArea;

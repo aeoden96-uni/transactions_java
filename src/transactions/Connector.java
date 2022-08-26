@@ -3,6 +3,17 @@ import java.util.*;import java.net.*;import java.io.*;
 
 public class Connector {
     ServerSocket listener;  Socket [] link;
+
+    /**
+     * This method is used to create a socket connection to the name server.
+     *
+     * @param basename The name of the name server.
+     * @param myId The id of the client.
+     * @param numProc The number of processes in the system.
+     * @param dataIn The input stream to read from.
+     * @param dataOut The output stream to write to.
+     * @throws Exception If there is an error creating the socket.
+     */
     public void Connect(String basename, int myId, int numProc,
                         BufferedReader[] dataIn, PrintWriter[] dataOut) throws Exception {
         Name myNameclient = new Name();
@@ -46,7 +57,17 @@ public class Connector {
             dataOut[i].flush();
         }
     }
+
+    /**
+     * This method is used to get the local port number of the process.
+     * @param id The id of the process.
+     * @return The local port number of the process.
+     */
     int getLocalPort(int id) { return Symbols.ServerPort + 10 + id; }
+
+    /**
+     * This method is used to close the socket connection to the name server.
+     */
     public void closeSockets(){
         try {
             listener.close();

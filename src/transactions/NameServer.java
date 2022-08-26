@@ -35,18 +35,5 @@ public class NameServer {
             System.err.println(e);
         }
     }
-    public static void main(String[] args) {
-        NameServer ns = new NameServer();
-        System.out.println("NameServer started:");
-        try {
-            ServerSocket listener = new ServerSocket(Symbols.ServerPort);
-            while (true) {
-                Socket aClient = listener.accept();
-                ns.handleclient(aClient);
-                aClient.close();
-            }
-        } catch (IOException e) {
-            System.err.println("Server aborted:" + e);
-        }
-    }
+
 }

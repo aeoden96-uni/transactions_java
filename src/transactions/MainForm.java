@@ -103,11 +103,11 @@ public class MainForm {
     }
 
 
-    public void startMaster() throws Exception {
+    public void startCoordinator() throws Exception {
         int numOfProcesess = Integer.parseInt(this.numOfProcesess.getValue().toString());
 
         Linker comm = new Linker("name", 0, numOfProcesess + 1, textArea1);
-        TwoPhaseCoord master = new TwoPhaseCoord(comm,textArea1);
+        TwoPhaseCoord coordinator = new TwoPhaseCoord(comm,textArea1);
 
 
         setProgressBar(50,"Waiting for all processes to confirm");
@@ -116,9 +116,9 @@ public class MainForm {
 
 
         for (int i = 1; i < numOfProcesess + 1; i++)
-                (new ListenerThread(i, master)).start();
+                (new ListenerThread(i, coordinator)).start();
 
-        String response = master.doCoordinator();
+        String response = coordinator.doCoordinator();
 
         // if finalCommit is in string
         if(response.contains("finalCommit")){
@@ -136,7 +136,7 @@ public class MainForm {
 
     }
 
-    public void startSlave() throws Exception {
+    public void startParticipant() throws Exception {
         boolean response;
         if(responseOKRadioButton.isSelected()){
             response = true;
@@ -172,10 +172,10 @@ public class MainForm {
         }
 
 
-        TwoPhaseParticipant slave = new TwoPhaseParticipant(comm,textArea1);
+        TwoPhaseParticipant participant = new TwoPhaseParticipant(comm,textArea1);
         for (int i = 0; i < numOfProcesess + 1; i++)
             if(i != processId)
-                (new ListenerThread(i, slave)).start();
+                (new ListenerThread(i, participant)).start();
 
 
 
@@ -199,13 +199,13 @@ public class MainForm {
             return;
         }
 
-        slave.propose(response);
+        participant.propose(response);
 
         setProgressBar(100,"Waiting for coordinator");
 
         statusCheck.setForeground(yellow);
 
-        boolean result = slave.decide();
+        boolean result = participant.decide();
 
 
         if(result){
@@ -231,10 +231,10 @@ public class MainForm {
                         startNameServer();
                     }
                     else if(masterRadioButton.isSelected()){
-                        startMaster();
+                        startCoordinator();
                     }
                     else{
-                        startSlave();
+                        startParticipant();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

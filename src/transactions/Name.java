@@ -29,14 +29,5 @@ public class Name {
         String hname = st.nextToken();
         return new PortAddr(hname, portnum);
     }
-    public static void main(String[] args) {
-        Name myClient = new Name();
-        try {
-            myClient.insertName("hello1", "oak.ece.utexas.edu", 1000);
-            PortAddr pa = myClient.searchName("hello1");
-            System.out.println(pa.getHostName() + ":" + pa.getPort());
-        } catch (Exception e) {
-            System.err.println("Server aborted:" + e);
-        }
-    }
+
 }
