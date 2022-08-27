@@ -9,70 +9,44 @@ import java.io.*; import java.lang.*;
  * message to the transaction object.
  *
  */
-public class Process implements MsgHandler {
+public abstract  class Process implements MsgHandler {
     int N, myId;
 
     Linker comm;
 
     JTextArea textArea;
 
+
+    /**
+     * This method is used to create a new process.
+     *
+     * @param initComm The linker object to use for communication.  This is used
+     *             to send messages to other processes.
+     */
     public Process(Linker initComm) {
         comm = initComm;
         myId = comm.getMyId();
         N = comm.getNumProc();
     }
-    public synchronized void handleMsg(Msg m, int src, String tag) {
-    }
-    public void sendMsg(int destId, String tag, String msg) {
+
+    public abstract void handleMsg(Msg m, int src, String tag);
+
+    public abstract void sendMsg(int destId, String tag);
 
 
-        if(textArea != null){
-            Util.println(  "Sending ⟶⟶⟶\n"
-                    + "            destination: " + destId + "\n"
-                    + "            tag: " + tag + "\n"
-                    + "            message: " + msg + "\n",textArea);
-
-        }
-
-        else
-            Util.println("Sending msg to " + destId + ":" +tag + " " + msg);
-        comm.sendMsg(destId, tag, msg);
-    }
-
-
-    public void sendMsg(int destId, String tag, int msg) {
-        sendMsg(destId, tag, String.valueOf(msg)+" ");
-    }
-
-    public void sendMsg(int destId, String tag, int msg1, int msg2) {
-        sendMsg(destId,tag,String.valueOf(msg1)
-                +" "+String.valueOf(msg2)+" ");
-    }
-    public void sendMsg(int destId, String tag) {
-        sendMsg(destId, tag, " some piece of data from " + myId + ". participant");
-    }
-    public void broadcastMsg(String tag, int msg) {
+    public void broadcastMsg(String tag) {
         for (int i = 0; i < N; i++) {
             if (i != myId) {
-                sendMsg(i, tag, msg);
+                sendMsg(i, tag);
             }
         }
-
     }
 
-    public void sendToNeighbors(String tag, int msg) {
-        for (int i = 0; i < N; i++)
-            if (isNeighbor(i)) sendMsg(i, tag, msg);
-    }
-    public boolean isNeighbor(int i) {
-        if (comm.neighbors.contains(i)) return true;
-        else return false;
-    }
     public Msg receiveMsg(int fromId) {
         try {
             return comm.receiveMsg(fromId);
         } catch (IOException e){
-            System.out.println(e);
+            System.out.println(e.getMessage());
             comm.close();
             return null;
         }
@@ -80,7 +54,7 @@ public class Process implements MsgHandler {
     public synchronized void myWait() {
         try {
             wait();
-        } catch (InterruptedException e) {System.err.println(e);
+        } catch (InterruptedException e) {System.err.println(e.getMessage());
         }
     }
 

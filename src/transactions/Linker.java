@@ -51,11 +51,11 @@ public class Linker {
         String msg = st.nextToken("#");
 
         if(textArea != null)
-            Util.println(" ⟶⟶⟶ received message\n"
-                    + "           source:   " + srcId + "\n"
-                    + "           destination:  " + destId + "\n"
-                    + "           tag:     " + tag + "\n"
-                    + "           message: " + msg + "\n", textArea);
+            Util.println("\n ⇨ received message\n"
+                    + "src: " + srcId
+                    + " | dest:  " + destId
+                    + " | tag:     " + tag + "\n"
+                    + "msg: " + msg , textArea);
         else
             Util.println(" received message " + getline);
 

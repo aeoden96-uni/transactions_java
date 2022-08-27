@@ -8,10 +8,8 @@ public class TwoPhaseParticipant extends Process {
     boolean done = false;
     boolean hasProposed = false;
 
+    boolean wrongMessage = false;
 
-    public TwoPhaseParticipant(Linker initComm) {
-        super(initComm);
-    }
 
     /**
      * This method is called by the coordinator to start the two-phase
@@ -26,6 +24,9 @@ public class TwoPhaseParticipant extends Process {
         this.textArea = textArea;
     }
 
+    public void setWrongMessage(boolean wrongMessage) {
+        this.wrongMessage = wrongMessage;
+    }
 
     /**
      * This method proposes a value to be committed.
@@ -48,6 +49,24 @@ public class TwoPhaseParticipant extends Process {
         return globalCommit;
     }
 
+
+    @Override
+    public void sendMsg(int destId, String tag) {
+
+        String encryptedString = "correct_message_" + myId;
+        if(wrongMessage) {
+            encryptedString = "wrong_message_" + myId;
+        }
+        encryptedString = AES.encrypt( encryptedString) ;
+
+        Util.println(  "Sending ⇨\n"
+                + "destination: " + destId
+                + " | tag: " + tag + "\n"
+                + "msg: " + encryptedString + "\n",textArea);
+
+        comm.sendMsg(destId, tag, encryptedString);
+    }
+
     /**
      * This method handles the message received by the participant.
      * @param m message received
@@ -56,19 +75,23 @@ public class TwoPhaseParticipant extends Process {
      */
     public synchronized void handleMsg(Msg m, int src, String tag) {
         while (!hasProposed) myWait();
-        if (tag.equals("request")) {
-            if (localCommit)
-                sendMsg(src, "yes");
-            else
-                sendMsg(src, "no");
-        } else if (tag.equals("finalCommit")) {
-            globalCommit = true;
-            done = true;
-            notify();
-        } else if (tag.equals("finalAbort")) {
-            globalCommit = false;
-            done = true;
-            notify();
+        switch (tag) {
+            case "request":
+                if (localCommit)
+                    sendMsg(src, "yes");
+                else
+                    sendMsg(src, "no");
+                break;
+            case "finalCommit":
+                globalCommit = true;
+                done = true;
+                notify();
+                break;
+            case "finalAbort":
+                globalCommit = false;
+                done = true;
+                notify();
+                break;
         }
     }
 }

@@ -29,6 +29,7 @@ public class MainForm {
     private JLabel statusLabel;
     private JSpinner processId;
     private JSpinner numOfProcesess;
+    private JRadioButton incorrectMessageRadioButton;
 
 
     private ButtonGroup typeGroup;
@@ -72,6 +73,7 @@ public class MainForm {
         responseOKRadioButton.setVisible(slaveRadioButton.isSelected());
         responseFRadioButton.setVisible(slaveRadioButton.isSelected());
         noResponseRadioButton.setVisible(slaveRadioButton.isSelected());
+        incorrectMessageRadioButton.setVisible(slaveRadioButton.isSelected());
 
         //ID and number of processes
         labelID.setVisible(!nameServerRadioButton.isSelected());
@@ -119,8 +121,9 @@ public class MainForm {
                 (new ListenerThread(i, coordinator)).start();
 
         String response = coordinator.doCoordinator();
+        //returns "commit" or "abort"
 
-        // if finalCommit is in string
+
         if(response.contains("finalCommit")){
             setProgressBar(100,"All processes confirmed");
             Color green = new Color(0, 128, 0);
@@ -180,6 +183,11 @@ public class MainForm {
 
 
         textArea1.append("The value decided:" + response + "\n\n");
+
+        if(incorrectMessageRadioButton.isSelected()){
+            textArea1.append("Participant will send wrong encrypted message.");
+            participant.setWrongMessage(true);
+        }
 
 
         int r = (int) (Math.random() * 12) + 1;
@@ -258,6 +266,7 @@ public class MainForm {
         responseGroup.add(responseOKRadioButton);
         responseGroup.add(responseFRadioButton);
         responseGroup.add(noResponseRadioButton);
+        responseGroup.add(incorrectMessageRadioButton);
 
         //set default values
         slaveRadioButton.setSelected(true);
@@ -266,11 +275,13 @@ public class MainForm {
         responseOKRadioButton.setEnabled(true);
         responseFRadioButton.setEnabled(true);
         noResponseRadioButton.setEnabled(true);
+        incorrectMessageRadioButton.setEnabled(true);
         statusCheck.setEnabled(false);
         statusCheck.setValue(100);
         statusCheck.setForeground(Color.gray);
 
-        numOfProcesess.setValue(3);
+        numOfProcesess.setValue(2);
+        processId.setValue(1);
 
         participantReply.setValue(100);
         participantReply.setForeground(green);
@@ -294,6 +305,7 @@ public class MainForm {
         responseOKRadioButton.addActionListener(listener);
         responseFRadioButton.addActionListener(listener);
         noResponseRadioButton.addActionListener(listener);
+        incorrectMessageRadioButton.addActionListener(listener);
 
 
         //set start button action
@@ -309,6 +321,7 @@ public class MainForm {
                 responseOKRadioButton.setEnabled(false);
                 responseFRadioButton.setEnabled(false);
                 noResponseRadioButton.setEnabled(false);
+                incorrectMessageRadioButton.setEnabled(false);
                 nameServerRadioButton.setEnabled(false);
                 masterRadioButton.setEnabled(false);
                 slaveRadioButton.setEnabled(false);

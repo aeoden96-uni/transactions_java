@@ -28,7 +28,7 @@ public class ListenerThread extends Thread {
                 Msg m = process.receiveMsg(channel);             
                 process.handleMsg(m, m.getSrcId(), m.getTag());
             } catch (IOException e) {
-                System.err.println(e);            
+                System.err.println(e.getMessage());
             }
         }
     }
