@@ -11,6 +11,8 @@ import java.net.Socket;
 public class MainForm {
     Color green = new Color(0, 141, 0); //GREEN
     Color red = new Color(255, 0, 0); //RED
+
+    Color yellow = new Color(92, 92, 27); //YELLOW
     private JPanel panel1;
     private JRadioButton nameServerRadioButton;
     private JRadioButton masterRadioButton;
@@ -29,13 +31,18 @@ public class MainForm {
     private JLabel statusLabel;
     private JSpinner processId;
     private JSpinner numOfProcesess;
-    private JRadioButton incorrectMessageRadioButton;
-    private JRadioButton wrongKeyRadioButton;
+
+    private JProgressBar acknowledgementsRecivedStatus;
+    private JLabel acknowledgementsRecivedStatusLabel;
+    private JProgressBar votesRecivedStatus;
+    private JLabel votesRecivedLabel;
 
 
     private ButtonGroup typeGroup;
 
     private ButtonGroup responseGroup;
+
+    static int numOfProcesses;
 
     public void setProgressBar(int value,String text) {
 
@@ -48,14 +55,16 @@ public class MainForm {
     }
 
     public static void main(String[] args){
-        int    numProc = 1;
+        numOfProcesses = 1;
+        int numOfWindows = 1;
 
         if(args.length > 0) {
-            numProc = Integer.parseInt(args[0]) + 2;
+            numOfProcesses = Integer.parseInt(args[0]);
+            numOfWindows = numOfProcesses + 2;
 
         }
 
-        for (int i = 0; i < numProc; i++) {
+        for (int i = 0; i < numOfWindows; i++) {
             JFrame window = new JFrame("Two-phase commit protocol");
             window.setContentPane(new MainForm().panel1);
             window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -74,8 +83,6 @@ public class MainForm {
         responseOKRadioButton.setVisible(slaveRadioButton.isSelected());
         responseFRadioButton.setVisible(slaveRadioButton.isSelected());
         noResponseRadioButton.setVisible(slaveRadioButton.isSelected());
-        incorrectMessageRadioButton.setVisible(slaveRadioButton.isSelected());
-        wrongKeyRadioButton.setVisible(slaveRadioButton.isSelected());
 
         //ID and number of processes
         labelID.setVisible(!nameServerRadioButton.isSelected());
@@ -89,6 +96,10 @@ public class MainForm {
         //indicators
         statusLabel.setVisible(!nameServerRadioButton.isSelected());
         statusCheck.setVisible(!nameServerRadioButton.isSelected());
+        votesRecivedStatus.setVisible(masterRadioButton.isSelected());
+        votesRecivedLabel.setVisible(masterRadioButton.isSelected());
+        acknowledgementsRecivedStatus.setVisible(masterRadioButton.isSelected());
+        acknowledgementsRecivedStatusLabel.setVisible(masterRadioButton.isSelected());
 
         participantReplyLabel.setVisible(slaveRadioButton.isSelected());
         participantReply.setVisible(slaveRadioButton.isSelected());
@@ -103,12 +114,6 @@ public class MainForm {
         else if(noResponseRadioButton.isSelected()){
             participantReply.setForeground(Color.BLACK);
         }
-        else if(incorrectMessageRadioButton.isSelected()){
-            participantReply.setForeground(red);
-        }
-        else if(wrongKeyRadioButton.isSelected()){
-            participantReply.setForeground(red);
-        }
         else{
             participantReply.setForeground(Color.BLACK);
         }
@@ -122,18 +127,47 @@ public class MainForm {
         Linker comm = new Linker("name", 0, numOfProcesess + 1, textArea1);
         TwoPhaseCoord coordinator = new TwoPhaseCoord(comm,textArea1);
 
+        for (int i = 1; i < numOfProcesess + 1; i++)
+            (new ListenerThread(i, coordinator)).start();
 
         setProgressBar(50,"Waiting for all processes to confirm");
-        Color yellow = new Color(92, 92, 27);
+        progressBar1.setIndeterminate(true);
         statusCheck.setForeground(yellow);
 
+        coordinator.votingPhase();
 
-        for (int i = 1; i < numOfProcesess + 1; i++)
-                (new ListenerThread(i, coordinator)).start();
+        progressBar1.setIndeterminate(false);
+        setProgressBar(100,"All processes confirmed");
+        progressBar1.setForeground(green);
+        votesRecivedStatus.setForeground(green);
 
-        String response = coordinator.doCoordinator();
+
+        progressBar1.setForeground(Color.gray);
+
+
+        for(int k = 0; k < 100; k+=1){
+            setProgressBar(k,"Sending commit/rollback msg");
+            Thread.sleep(100);
+            //print thread status
+        }
+        setProgressBar(100,"Sending commit/rollback msg");
+
+        coordinator.sendCommit();
+
+        setProgressBar(0,"Waiting acknowledgements");
+        progressBar1.setIndeterminate(true);
+
+
+        coordinator.acknowledgePhase();
+
+        progressBar1.setIndeterminate(false);
+        setProgressBar(100,"All processes acknowledged");
+        acknowledgementsRecivedStatus.setForeground(green);
+
+
+
+        String response = coordinator.finalPhase();
         //returns "commit" or "abort"
-
 
         if(response.contains("finalCommit")){
             setProgressBar(100,"All processes confirmed");
@@ -195,21 +229,14 @@ public class MainForm {
 
         textArea1.append("The value decided:" + response + "\n\n");
 
-        if(incorrectMessageRadioButton.isSelected()){
-            textArea1.append("Participant will send wrong encrypted message.");
-            participant.setWrongMessage(true);
-        } else if(wrongKeyRadioButton.isSelected()){
-            textArea1.append("Participant will encrypt with wrong key.");
-            participant.setWrongKey(true);
-        }
-
-
 
         int r = (int) (Math.random() * 12) + 1;
         for(int k = 0; k < 100; k+=r){
-            setProgressBar(k,"Sending confirmation to coordinator");
-            Thread.sleep(100);
+            setProgressBar(k,"Sending confirmation.");
+            Thread.sleep(200);
+            //print thread status
         }
+        setProgressBar(100,"Sending confirmation.");
 
         Color yellow = new Color(92, 92, 27);
         if(noResponseRadioButton.isSelected()){
@@ -222,21 +249,28 @@ public class MainForm {
             return;
         }
 
-        participant.propose(response);
+        participant.vote(response);
 
-        setProgressBar(100,"Waiting for coordinator");
+        setProgressBar(0,"Waiting for coordinator");
+        progressBar1.setIndeterminate(true);
 
         statusCheck.setForeground(yellow);
 
-        boolean result = participant.decide();
+        boolean result = participant.coordResult();
+        progressBar1.setIndeterminate(false);
+        statusCheck.setForeground(result?green:red);
 
 
-        if(result){
-            statusCheck.setForeground(green);
+
+        r = (int) (Math.random() * 12) + 1;
+        for(int k = 0; k <= 100; k+=r){
+            setProgressBar(k,"Sending acknowledgement");
+            Thread.sleep(200);
         }
-        else{
-            statusCheck.setForeground(red);
-        }
+        setProgressBar(100,"Sending acknowledgement");
+
+        participant.acknowledge();
+
 
 
 
@@ -279,28 +313,37 @@ public class MainForm {
         responseGroup.add(responseOKRadioButton);
         responseGroup.add(responseFRadioButton);
         responseGroup.add(noResponseRadioButton);
-        responseGroup.add(incorrectMessageRadioButton);
-        responseGroup.add(wrongKeyRadioButton);
 
         //set default values
         slaveRadioButton.setSelected(true);
         responseOKRadioButton.setSelected(true);
 
+
         responseOKRadioButton.setEnabled(true);
         responseFRadioButton.setEnabled(true);
         noResponseRadioButton.setEnabled(true);
-        incorrectMessageRadioButton.setEnabled(true);
-        wrongKeyRadioButton.setEnabled(true);
         statusCheck.setEnabled(false);
         statusCheck.setValue(100);
         statusCheck.setForeground(Color.gray);
 
-        numOfProcesess.setValue(2);
+        numOfProcesess.setValue(numOfProcesses);
         processId.setValue(1);
 
         participantReply.setValue(100);
         participantReply.setForeground(green);
         participantReply.setEnabled(false);
+
+        acknowledgementsRecivedStatusLabel.setVisible(false);
+        acknowledgementsRecivedStatus.setVisible(false);
+        acknowledgementsRecivedStatus.setValue(100);
+        acknowledgementsRecivedStatus.setForeground(Color.gray);
+        acknowledgementsRecivedStatus.setEnabled(false);
+
+        votesRecivedLabel.setVisible(false);
+        votesRecivedStatus.setVisible(false);
+        votesRecivedStatus.setValue(100);
+        votesRecivedStatus.setForeground(Color.gray);
+        votesRecivedStatus.setEnabled(false);
 
 
 
@@ -320,8 +363,6 @@ public class MainForm {
         responseOKRadioButton.addActionListener(listener);
         responseFRadioButton.addActionListener(listener);
         noResponseRadioButton.addActionListener(listener);
-        incorrectMessageRadioButton.addActionListener(listener);
-        wrongKeyRadioButton.addActionListener(listener);
 
 
         //set start button action
@@ -337,8 +378,6 @@ public class MainForm {
                 responseOKRadioButton.setEnabled(false);
                 responseFRadioButton.setEnabled(false);
                 noResponseRadioButton.setEnabled(false);
-                incorrectMessageRadioButton.setEnabled(false);
-                wrongKeyRadioButton.setEnabled(false);
                 nameServerRadioButton.setEnabled(false);
                 masterRadioButton.setEnabled(false);
                 slaveRadioButton.setEnabled(false);

@@ -1,15 +1,26 @@
 package transactions;
 
 import javax.swing.*;
-
+/**TwoPhaseParticipant is a process that participates in the two-phase commit protocol.
+ * It is responsible for sending prepare message to the coordinator,
+ * and receiving the replies.
+ * If all replies are received, it sends the commit message to the coordinator.
+ *
+ */
 public class TwoPhaseParticipant extends Process {
-    boolean localCommit;
-    boolean globalCommit;
-    boolean done = false;
-    boolean hasProposed = false;
 
-    boolean wrongMessage = false;
-    boolean wrongKey = false;
+    boolean globalCommit;
+
+
+
+    boolean doneAcknowledgingPhase = false;
+    boolean done = false;
+
+
+    boolean hasAcknowledged = false;
+    boolean hasVoted = false;
+    boolean myVote;
+
 
 
     /**
@@ -25,20 +36,18 @@ public class TwoPhaseParticipant extends Process {
         this.textArea = textArea;
     }
 
-    public void setWrongKey(boolean wrongKey) {
-        this.wrongKey = wrongKey;
-    }
-    public void setWrongMessage(boolean wrongMessage) {
-        this.wrongMessage = wrongMessage;
-    }
-
     /**
      * This method proposes a value to be committed.
      * @param vote value to be committed
      */
-    public synchronized void propose(boolean vote) {
-        localCommit = vote;
-        hasProposed = true;
+    public synchronized void vote(boolean vote) {
+        myVote = vote;
+        hasVoted = true;
+        notify();
+    }
+
+    public synchronized void acknowledge() {
+        hasAcknowledged = true;
         notify();
     }
 
@@ -48,7 +57,7 @@ public class TwoPhaseParticipant extends Process {
      * is committed, false otherwise.
      * @return true if the proposal is committed, false otherwise
      */
-    public synchronized boolean decide() {
+    public synchronized boolean coordResult() {
         while (!done) myWait();
         return globalCommit;
     }
@@ -57,21 +66,22 @@ public class TwoPhaseParticipant extends Process {
     @Override
     public void sendMsg(int destId, String tag) {
 
-        String encryptedString = "correct_message_" + myId;
-        if(wrongMessage) {
-            encryptedString = "wrong_message_" + myId;
+        if(tag.equals("acknowledge")) {
+            Util.println(  "Sending ⇨\n"
+                    + "destination: " + destId
+                    + " | tag: " + tag + "\n"
+                    + "msg: " + "" + "\n",textArea);
+
+            comm.sendMsg(destId, tag, "Acknowledged.");
+            return;
         }
-
-
-        encryptedString = AES.encrypt( encryptedString,wrongKey);
-
 
         Util.println(  "Sending ⇨\n"
                 + "destination: " + destId
                 + " | tag: " + tag + "\n"
-                + "msg: " + encryptedString + "\n",textArea);
+                + "msg : " + "message_"+ myId + "\n",textArea);
 
-        comm.sendMsg(destId, tag, encryptedString);
+        comm.sendMsg(destId, tag, "message_"+ myId);
     }
 
     /**
@@ -81,23 +91,32 @@ public class TwoPhaseParticipant extends Process {
      * @param tag tag of the message
      */
     public synchronized void handleMsg(Msg m, int src, String tag) {
-        while (!hasProposed) myWait();
+        while (!hasVoted) myWait();
         switch (tag) {
             case "request":
-                if (localCommit)
+                if (myVote)
                     sendMsg(src, "yes");
                 else
                     sendMsg(src, "no");
                 break;
             case "finalCommit":
+                doneAcknowledgingPhase = true;
                 globalCommit = true;
                 done = true;
                 notify();
+                while (!hasAcknowledged) myWait();
+                sendMsg(src, "acknowledge");
                 break;
             case "finalAbort":
+                doneAcknowledgingPhase = true;
                 globalCommit = false;
                 done = true;
                 notify();
+                while (!hasAcknowledged) myWait();
+                sendMsg(src, "acknowledge");
+                break;
+            default:
+                Util.println("Unknown tag: " + tag, textArea);
                 break;
         }
     }

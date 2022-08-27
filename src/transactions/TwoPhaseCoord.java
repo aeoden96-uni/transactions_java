@@ -5,10 +5,13 @@ import java.util.Objects;
 
 public class TwoPhaseCoord extends Process {
     boolean globalCommit = false;
-    boolean donePhase1 = false;
+    boolean doneVotingPhase = false;
+
+    boolean doneAcknowledgingPhase = false;
     boolean noReceived = false;
     int numParticipants;
     int numReplies = 0;
+    int numAknowledged = 0;
 
 
     /**TwoPhaseCoord is a process that coordinates the two-phase commit protocol.
@@ -34,27 +37,55 @@ public class TwoPhaseCoord extends Process {
      *
      * @return finalAbort if the transaction is aborted, finalCommit if the transaction is committed.
      */
-    public synchronized String doCoordinator() {
+
+
+    public synchronized void votingPhase() {
         // Phase 1
         broadcastMsg("request");
-        while (!donePhase1)
+        while (!doneVotingPhase)
             myWait();
+    }
 
+    public synchronized void sendCommit() {
         // Phase 2
         if (noReceived) {
             broadcastMsg("finalAbort");
-            return "finalAbort " + myId;
         }
         else {
             globalCommit = true;
             broadcastMsg("finalCommit");
+        }
+    }
+
+    public synchronized void acknowledgePhase() {
+        while (!doneAcknowledgingPhase)
+            myWait();
+    }
+
+    public synchronized String finalPhase(){
+        if (noReceived) {
+            return "finalAbort " + myId;
+        }
+        else {
             return "finalCommit " + myId;
         }
     }
+
+
+    public synchronized String doCoordinator() {
+        votingPhase();
+
+        sendCommit();
+
+        acknowledgePhase();
+
+        return finalPhase();
+    }
+
     @Override
     public void sendMsg(int destId, String tag) {
 
-        Util.println(  "Sending ⇨\n"
+        Util.println(  "\nSending ⇨\n"
                 + "destination: " + destId
                 + " | tag: " + tag + "\n"
                 + "msg: " + myId + "\n",textArea);
@@ -70,15 +101,6 @@ public class TwoPhaseCoord extends Process {
     @Override
     public Msg receiveMsg(int fromId) {
         Msg m = super.receiveMsg(fromId);
-
-        String decryptedMessage = messageDecrypt(m.getMessage());
-        textArea.append("Decrypted message: " + decryptedMessage + "\n");
-
-        if(!Objects.equals(decryptedMessage, "correct_message_" + fromId)) {
-            textArea.append("Message from " + fromId + " is wrong\n\n");
-            return new Msg(m.srcId, m.destId, "no", "wrong_message_" + fromId);
-        }
-        textArea.append("Message from " + fromId + " is OK\n\n");
         return m;
     }
 
@@ -93,13 +115,19 @@ public class TwoPhaseCoord extends Process {
         if (tag.equals("yes")) {
             numReplies++;
             if (numReplies == numParticipants) {
-                donePhase1 = true;
+                doneVotingPhase = true;
                 notify();
             }
         } else if (tag.equals("no")) {
             noReceived = true;
-            donePhase1 = true;
+            doneVotingPhase = true;
             notify();
+        } else if (tag.equals("acknowledge")) {
+            numAknowledged++;
+            if (numAknowledged == numParticipants) {
+                doneAcknowledgingPhase = true;
+                notify();
+            }
         }
     }
 }
