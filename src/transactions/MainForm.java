@@ -30,6 +30,7 @@ public class MainForm {
     private JSpinner processId;
     private JSpinner numOfProcesess;
     private JRadioButton incorrectMessageRadioButton;
+    private JRadioButton wrongKeyRadioButton;
 
 
     private ButtonGroup typeGroup;
@@ -55,15 +56,15 @@ public class MainForm {
         }
 
         for (int i = 0; i < numProc; i++) {
-            JFrame slave = new JFrame("Two-phase commit protocol");
-            slave.setContentPane(new MainForm().panel1);
-            slave.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            slave.setLocation(1000, 100* i);
-            slave.setResizable(false);
-            slave.setPreferredSize(new Dimension(500, 350));
-            slave.setSize(new Dimension(330, 320));
-            slave.pack();
-            slave.setVisible(true);
+            JFrame window = new JFrame("Two-phase commit protocol");
+            window.setContentPane(new MainForm().panel1);
+            window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            window.setLocation(1000, 100* i);
+            window.setResizable(false);
+            window.setPreferredSize(new Dimension(500, 360));
+            window.setSize(new Dimension(330, 320));
+            window.pack();
+            window.setVisible(true);
         }
 
     }
@@ -74,6 +75,7 @@ public class MainForm {
         responseFRadioButton.setVisible(slaveRadioButton.isSelected());
         noResponseRadioButton.setVisible(slaveRadioButton.isSelected());
         incorrectMessageRadioButton.setVisible(slaveRadioButton.isSelected());
+        wrongKeyRadioButton.setVisible(slaveRadioButton.isSelected());
 
         //ID and number of processes
         labelID.setVisible(!nameServerRadioButton.isSelected());
@@ -96,6 +98,15 @@ public class MainForm {
             participantReply.setForeground(green);
         }
         else if(responseFRadioButton.isSelected()){
+            participantReply.setForeground(red);
+        }
+        else if(noResponseRadioButton.isSelected()){
+            participantReply.setForeground(Color.BLACK);
+        }
+        else if(incorrectMessageRadioButton.isSelected()){
+            participantReply.setForeground(red);
+        }
+        else if(wrongKeyRadioButton.isSelected()){
             participantReply.setForeground(red);
         }
         else{
@@ -187,7 +198,11 @@ public class MainForm {
         if(incorrectMessageRadioButton.isSelected()){
             textArea1.append("Participant will send wrong encrypted message.");
             participant.setWrongMessage(true);
+        } else if(wrongKeyRadioButton.isSelected()){
+            textArea1.append("Participant will encrypt with wrong key.");
+            participant.setWrongKey(true);
         }
+
 
 
         int r = (int) (Math.random() * 12) + 1;
@@ -220,8 +235,6 @@ public class MainForm {
             statusCheck.setForeground(green);
         }
         else{
-
-
             statusCheck.setForeground(red);
         }
 
@@ -267,6 +280,7 @@ public class MainForm {
         responseGroup.add(responseFRadioButton);
         responseGroup.add(noResponseRadioButton);
         responseGroup.add(incorrectMessageRadioButton);
+        responseGroup.add(wrongKeyRadioButton);
 
         //set default values
         slaveRadioButton.setSelected(true);
@@ -276,6 +290,7 @@ public class MainForm {
         responseFRadioButton.setEnabled(true);
         noResponseRadioButton.setEnabled(true);
         incorrectMessageRadioButton.setEnabled(true);
+        wrongKeyRadioButton.setEnabled(true);
         statusCheck.setEnabled(false);
         statusCheck.setValue(100);
         statusCheck.setForeground(Color.gray);
@@ -306,6 +321,7 @@ public class MainForm {
         responseFRadioButton.addActionListener(listener);
         noResponseRadioButton.addActionListener(listener);
         incorrectMessageRadioButton.addActionListener(listener);
+        wrongKeyRadioButton.addActionListener(listener);
 
 
         //set start button action
@@ -322,6 +338,7 @@ public class MainForm {
                 responseFRadioButton.setEnabled(false);
                 noResponseRadioButton.setEnabled(false);
                 incorrectMessageRadioButton.setEnabled(false);
+                wrongKeyRadioButton.setEnabled(false);
                 nameServerRadioButton.setEnabled(false);
                 masterRadioButton.setEnabled(false);
                 slaveRadioButton.setEnabled(false);

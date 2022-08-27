@@ -14,13 +14,26 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 class AES {
+
+    private static boolean wrong_key = false;
     // Class private variables
 
-
+    public static String encrypt(String strToEncrypt,boolean wrong_key){
+        AES.wrong_key = wrong_key;
+        return encrypt(strToEncrypt);
+    }
 
     // This method use to encrypt to string
     public static String encrypt(String strToEncrypt)
     {
+        String key = Symbols.secretKey;
+        String salt = Symbols.salt;
+
+        if(wrong_key) {
+            key = "11223344";
+            salt = "789456123";
+        }
+
         try {
 
             // Create default byte array
@@ -37,7 +50,7 @@ class AES {
             // Create KeySpec object and assign with
             // constructor
             KeySpec spec = new PBEKeySpec(
-                    Symbols.secretKey.toCharArray(), Symbols.salt.getBytes(),
+                    key.toCharArray(), salt.getBytes(),
                     65536, 256);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKeySpec secretKey = new SecretKeySpec(
@@ -62,6 +75,7 @@ class AES {
     // This method use to decrypt to string
     public static String decrypt(String strToDecrypt)
     {
+
         try {
 
             // Default byte array

@@ -9,6 +9,7 @@ public class TwoPhaseParticipant extends Process {
     boolean hasProposed = false;
 
     boolean wrongMessage = false;
+    boolean wrongKey = false;
 
 
     /**
@@ -24,6 +25,9 @@ public class TwoPhaseParticipant extends Process {
         this.textArea = textArea;
     }
 
+    public void setWrongKey(boolean wrongKey) {
+        this.wrongKey = wrongKey;
+    }
     public void setWrongMessage(boolean wrongMessage) {
         this.wrongMessage = wrongMessage;
     }
@@ -57,7 +61,10 @@ public class TwoPhaseParticipant extends Process {
         if(wrongMessage) {
             encryptedString = "wrong_message_" + myId;
         }
-        encryptedString = AES.encrypt( encryptedString) ;
+
+
+        encryptedString = AES.encrypt( encryptedString,wrongKey);
+
 
         Util.println(  "Sending ⇨\n"
                 + "destination: " + destId
