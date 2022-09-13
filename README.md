@@ -44,15 +44,12 @@ java -jar ./transactions_java.jar 3
 
 ### Sucessfull transaction commit
 #### All Participants returned 'success' message back to Coordinator.
-![This is an image](anim_success.gif)
+![This is an image](animation_success.gif)
 
 ### Failed transaction commit - doing rollback
 #### First Participant returned 'failed' message back to Coordinator.
-![This is an image](anim_fail.gif)
+![This is an image](animation_fail.gif)
 
-### Failed transaction commit - no response from participant
-#### Second Participant didn't return message back to Coordinator.
-![This is an image](anim_no_response.gif)    
     
 ## Literature
 
