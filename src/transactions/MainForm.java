@@ -124,8 +124,18 @@ public class MainForm {
     public void startCoordinator() throws Exception {
         int numOfProcesess = Integer.parseInt(this.numOfProcesess.getValue().toString());
 
-        Linker comm = new Linker("name", 0, numOfProcesess + 1, textArea1);
-        TwoPhaseCoord coordinator = new TwoPhaseCoord(comm,textArea1);
+        Linker comm;
+        TwoPhaseCoord coordinator = null;
+        try{
+            comm = new Linker("name", 0, numOfProcesess + 1, textArea1);
+            coordinator = new TwoPhaseCoord(comm,textArea1);
+        }
+        catch (java.net.ConnectException e){
+            JOptionPane.showMessageDialog(null, "Name server is not running");
+            //exit program
+            System.exit(1);
+        }
+
 
         for (int i = 1; i < numOfProcesess + 1; i++)
             (new ListenerThread(i, coordinator)).start();
